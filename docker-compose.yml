@@ -1,0 +1,27 @@
+proxy:
+    image: jwilder/nginx-proxy:alpine
+    container_name: proxy
+    volumes:
+        - /var/run/docker.sock:/tmp/docker.sock:ro
+        - ./docker-compose.d/certs:/etc/nginx/certs:ro
+        - ./docker-compose.d/nginx.tmpl:/app/nginx.tmpl
+    ports:
+        - "80:80"
+        - "443:443"
+
+mysql:
+    image: mysql:8.0.30
+    container_name: mysql
+
+
+myblog.lab:
+    image: atsu666/acms:8.0
+    privileged: true
+    volumes:
+        - ./acms:/var/www/html
+        - /etc/localtime:/etc/localtime:ro
+    links:
+        - mysql:mysql
+    environment:
+        - VIRTUAL_HOST=myblog.lab
+        - HTTPS_METHOD=noredirect
